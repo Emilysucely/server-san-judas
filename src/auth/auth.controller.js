@@ -1,5 +1,6 @@
 import User from '../users/user.model.js'
 import { hash } from 'argon2'
+import { generarJWT } from "../../helpers/JWT_generate.js"
 
 export const register = async (req, res) => {
     try{
@@ -16,10 +17,52 @@ export const register = async (req, res) => {
             password: encryptedPassword,
             profilePicture
         }) 
+        return res.status(200).json({
+            message: "Usuario registrado correctamente",
+            userDetails: {
+                user: newuser.username,
+                email: newuser.email,
+            },
+        });
     }catch(error){
         return res.status(500).json({
             message: 'Error al registrar el usuario',
             err: error.message
         })
     } 
+
 }
+export const login = async (req, res) => {
+    const { email, password, username } = req.body;
+
+    try{ 
+        const lowerEmail = email ? email.tolowerCase() : null;
+        const lowerUseranme = username ? username.tolowerCase() : null;
+
+        const user = await User.findOne({
+            sor: [{ email: lowerEmail }, { username: lowerUsername }],
+        });
+
+        if (!user) {
+            return res.status(401).json({ message: "Credenciales incorrectas"});
+        }
+
+        const token = await generarJWT(user.id, user.email);
+
+        return res. status(200).json({
+            message: "Inicio de sesión exitoso",
+            userDetails: {
+                username: user.username,
+                token: token,
+                profilePicture: user.profilePicture,
+                uid: user.id
+            },
+        });
+    }catch (error) {
+        return res.status(500).json({
+            message: "Error del servidor",
+            error: error.message,
+        });
+    }
+
+};
