@@ -7,33 +7,48 @@ import morgan from 'morgan';
 import { dbConnection } from './db.js';
 import 'dotenv/config';
 import userModel from  '../src/users/user.model.js'
+import authRoutes from '../src/auth/auth.routes.js'
 
 
 const middlewares = (app) => {
     app.use(express.json());
     app.use(express.urlencoded({extended: false}));
-    app.use(cors());
-    app.use(helmet());
+    app.use(cors({
+        origin: '*',
+        credentials: true,
+        methods: [ 'GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content.Type', 'Authorization'],
+    }));
+    app.use(helmet({
+        crossOriginResourcePolicy: { policy: "cross-origin"},
+        crossOriginEmbedderPolicy: false 
+    }));
     app.use(morgan('dev'));
 }
+
+const routes = (app) => {
+    app.use('/api/auth', authRoutes)
+}
+
 const conectarDB = async () =>{
     try{ 
          await dbConnection();
     }catch(error){
-        console.log('Error al conectar a la db: ${error.message}')
+        console.log(`Error al conectar a la db: ${error.message}`)
     }
 }
 
 export const initServer = async()=>{
     const app = express();
 
-    try{
+    try{ 
         middlewares(app)
+        routes(app) 
         await conectarDB()
         app.listen(process.env.PORT, () =>{
-            console.log('Servidor corriendo en el puerto ${process.env.PORT}')
+            console.log(`Servidor corriendo en el puerto ${process.env.PORT}`)
         })
     }catch(error){
-        console.log('Error al iniciar el servidor: $ (error)');
+        console.log(`Error al iniciar el servidor: ${error}`);
     }
 }
