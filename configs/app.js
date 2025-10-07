@@ -5,10 +5,10 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { dbConnection } from './db.js';
-import 'dotenv/config';
+import 'dotenv/config'; 
 import userModel from  '../src/users/user.model.js'
 import authRoutes from '../src/auth/auth.routes.js'
-
+import requestlimit from '../middlewares/resquest-limit.js';
 
 const middlewares = (app) => {
     app.use(express.json());
@@ -24,6 +24,7 @@ const middlewares = (app) => {
         crossOriginEmbedderPolicy: false 
     }));
     app.use(morgan('dev'));
+    app.use(requestlimit)
 }
 
 const routes = (app) => {

@@ -36,12 +36,14 @@ export const login = async (req, res) => {
     const { email, password, username } = req.body;
 
     try{ 
-        const lowerEmail = email ? email.tolowerCase() : null;
-        const lowerUseranme = username ? username.tolowerCase() : null;
+        const lowerEmail = email ? email.toLowerCase() : null;
+        const lowerUsername = username ? username.toLowerCase() : null;
 
         const user = await User.findOne({
-            sor: [{ email: lowerEmail }, { username: lowerUsername }],
+            $or: [{ email: lowerEmail }, { username: lowerUsername }],
         });
+
+        console.log(lowerEmail, lowerUsername, user)
 
         if (!user) {
             return res.status(401).json({ message: "Credenciales incorrectas"});
