@@ -8,6 +8,7 @@ import { dbConnection } from './db.js';
 import 'dotenv/config'; 
 import userModel from  '../src/users/user.model.js'
 import authRoutes from '../src/auth/auth.routes.js'
+import postRoutes from '../src/posts/post.routes.js'
 import requestlimit from '../middlewares/resquest-limit.js';
 
 const middlewares = (app) => {
@@ -29,9 +30,10 @@ const middlewares = (app) => {
 
 const routes = (app) => {
     app.use('/api/auth', authRoutes)
+    app.use('/api/posts', postRoutes)
 }
 
-const conectarDB = async () =>{
+const conectarDB = async () => {
     try{ 
          await dbConnection();
     }catch(error){
