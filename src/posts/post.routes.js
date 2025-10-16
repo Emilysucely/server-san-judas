@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { createPost, getAndposts, getPostById } from './post.controller.js'
+import { createpostValidator } from '../../middlewares/post-validator.js'
 
 const router = Router()
 
-router.post('/', createPost)
+router.post('/', createpostValidator, createPost)
 
 router.get('/', getAndposts)
 
